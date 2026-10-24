@@ -1,0 +1,9 @@
+url,label
+https://www.wikipedia.org/,safe
+https://www.python.org/,safe
+https://www.microsoft.com/,safe
+http://paypa1-secure-login.com/verify,phishing
+http://amaz0n-account-update.tk/signin,phishing
+http://secure-bankofindia-verify.xyz/login,phishing
+http://192.0.2.1/login,suspicious
+http://paypal.com.security-check.example.invalid/login,suspicious

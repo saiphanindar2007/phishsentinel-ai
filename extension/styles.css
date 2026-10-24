@@ -1,0 +1,82 @@
+/* PhishSentinel AI — in-page banner styles */
+
+.phishsentinel-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2147483647; /* max z-index, always on top */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  animation: phishsentinel-slide-down 0.2s ease-out;
+}
+
+@keyframes phishsentinel-slide-down {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+.phishsentinel-danger {
+  background: #7a1f1f;
+  color: #fff;
+  border-bottom: 3px solid #E14B4B;
+}
+
+.phishsentinel-warning {
+  background: #7a5b1f;
+  color: #fff;
+  border-bottom: 3px solid #D9A441;
+}
+
+.phishsentinel-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.phishsentinel-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.phishsentinel-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.phishsentinel-text strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.phishsentinel-text p {
+  margin: 0;
+  font-size: 12.5px;
+  opacity: 0.92;
+  line-height: 1.4;
+}
+
+.phishsentinel-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.phishsentinel-actions button {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.phishsentinel-actions button:hover {
+  background: rgba(255, 255, 255, 0.22);
+}

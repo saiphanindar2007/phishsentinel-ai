@@ -1,0 +1,69 @@
+{
+  "run_at": "2026-10-24T18:09:45.938842Z",
+  "dataset_path": "eval\\labeled_urls.csv",
+  "dataset_sha256_16": "d4b4bb619dc2fd53",
+  "dataset_size": 8,
+  "config": {
+    "fusion_weights": {
+      "url": 1.0,
+      "nlp": 0.0,
+      "visual": 0.0,
+      "reputation": 0.0
+    },
+    "suspicious_threshold": 0.4,
+    "phishing_threshold": 0.7
+  },
+  "accuracy": 0.75,
+  "macro_f1": 0.7222,
+  "per_class": {
+    "safe": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 3
+    },
+    "suspicious": {
+      "precision": 0.5,
+      "recall": 1.0,
+      "f1": 0.6667,
+      "support": 2
+    },
+    "phishing": {
+      "precision": 1.0,
+      "recall": 0.3333,
+      "f1": 0.5,
+      "support": 3
+    }
+  },
+  "confusion_matrix": {
+    "safe": {
+      "safe": 3,
+      "suspicious": 0,
+      "phishing": 0
+    },
+    "suspicious": {
+      "safe": 0,
+      "suspicious": 2,
+      "phishing": 0
+    },
+    "phishing": {
+      "safe": 0,
+      "suspicious": 2,
+      "phishing": 1
+    }
+  },
+  "mismatches": [
+    {
+      "url": "http://paypa1-secure-login.com/verify",
+      "label": "phishing",
+      "predicted": "suspicious",
+      "confidence": 0.602
+    },
+    {
+      "url": "http://secure-bankofindia-verify.xyz/login",
+      "label": "phishing",
+      "predicted": "suspicious",
+      "confidence": 0.46
+    }
+  ]
+}

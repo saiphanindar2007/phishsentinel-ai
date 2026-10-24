@@ -1,0 +1,62 @@
+# PhishSentinel AI — production-style stack
+#   Postgres + backend API + nginx-served dashboard (same-origin /api proxy)
+#
+#   cp .env.example .env     # then set the three REQUIRED values
+#   docker compose up --build -d
+#   Dashboard: http://localhost:8080      (Settings tab -> paste API key / admin key)
+#
+# Only the dashboard port is published; the API and database stay on the
+# private compose network. Put a TLS-terminating proxy (Caddy/Traefik/
+# cloud LB) in front for real deployments.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: phishsentinel
+      POSTGRES_USER: phishsentinel
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phishsentinel -d phishsentinel"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: postgresql+psycopg://phishsentinel:${POSTGRES_PASSWORD}@db:5432/phishsentinel
+      API_KEY: ${API_KEY:?set API_KEY in .env}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:?set ADMIN_API_KEY in .env}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+      TRUST_PROXY_HEADERS: "true"          # we sit behind nginx
+      RETENTION_DAYS: ${RETENTION_DAYS:-0}
+    volumes:
+      - ./backend/training/artifacts:/app/training/artifacts:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pgdata:

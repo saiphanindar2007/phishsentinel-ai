@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  @apply text-ink antialiased bg-surface;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  @apply border-line;
+}
+
+::selection {
+  background: #99F6E4;
+  color: #0A1526;
+}
+
+/* Thin, unobtrusive scrollbars — this is a dashboard people live in all day. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 999px; border: 2px solid #F6F8FB; }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+/* Keyboard-navigation focus ring, never a mouse-click outline. */
+:focus-visible {
+  outline: 2px solid #0EA5A8;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.font-mono-ui {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 160ms ease-out; }

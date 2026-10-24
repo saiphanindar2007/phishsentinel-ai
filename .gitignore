@@ -1,0 +1,16 @@
+# Node / dashboard
+dashboard/node_modules/
+dashboard/dist/
+dashboard/.env
+
+# Python / backend
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.venv/
+backend/*.db
+backend/.env
+backend/training/artifacts/*.pkl
+
+# OS
+.DS_Store
+Thumbs.db

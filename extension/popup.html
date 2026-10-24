@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>PhishSentinel AI</title>
+  <style>
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      background: #0B1E3D;
+      color: #fff;
+    }
+    header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid #24406B;
+    }
+    header h1 {
+      font-size: 15px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block;
+    }
+    main { padding: 16px; }
+    .verdict-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .safe { background: #0E8F6C; }
+    .suspicious { background: #BA7517; }
+    .phishing { background: #E14B4B; }
+    .confidence {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 4px 0 10px;
+    }
+    .explanation {
+      font-size: 12.5px;
+      color: #C7D6E8;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .breakdown-item {
+      background: #132A4E;
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+    .breakdown-item .label { font-size: 10px; color: #7C90AC; text-transform: uppercase; }
+    .breakdown-item .value { font-size: 15px; font-weight: 600; }
+    .feedback-row { display: flex; gap: 8px; }
+    button {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #24406B;
+      background: #132A4E;
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    button:hover { background: #1a3a63; }
+    .empty-state {
+      text-align: center;
+      color: #7C90AC;
+      font-size: 12.5px;
+      padding: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><span class="status-dot" id="statusDot" style="background:#7C90AC"></span> PhishSentinel AI</h1>
+  </header>
+  <main id="main">
+    <div class="empty-state">Loading verdict for this tab…</div>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

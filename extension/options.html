@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>PhishSentinel AI — Settings</title>
+<style>
+  body { font: 14px/1.5 -apple-system, Segoe UI, Roboto, sans-serif; max-width: 480px; margin: 32px auto; padding: 0 16px; color: #0B1E3D; }
+  h1 { font-size: 18px; } label { display: block; margin-top: 16px; font-weight: 600; font-size: 12px; color: #52627c; }
+  input { width: 100%; box-sizing: border-box; margin-top: 4px; padding: 8px 10px; border: 1px solid #d5dbe5; border-radius: 8px; font-size: 14px; }
+  button { margin-top: 20px; background: #0B1E3D; color: #fff; border: 0; border-radius: 8px; padding: 9px 18px; font-size: 14px; cursor: pointer; }
+  #msg { margin-left: 12px; font-size: 12px; } .ok { color: #059669; } .bad { color: #E14B4B; }
+  p.hint { font-size: 12px; color: #52627c; }
+</style>
+</head>
+<body>
+  <h1>PhishSentinel AI</h1>
+  <p class="hint">Point the extension at your PhishSentinel server. Private/intranet addresses are never sent to it.</p>
+  <label for="base">Server URL</label>
+  <input id="base" placeholder="https://phishsentinel.example.com" />
+  <label for="key">API key <span style="font-weight:400">(if your server requires one)</span></label>
+  <input id="key" type="password" autocomplete="off" />
+  <button id="save">Save &amp; test</button><span id="msg"></span>
+  <script src="options.js"></script>
+</body>
+</html>

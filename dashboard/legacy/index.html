@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<!--
+  PhishSentinel AI — Legacy Analyst Dashboard (zero-build fallback)
+  ---------------------------------------------------------------
+  This is the ORIGINAL single-file dashboard. The primary dashboard now
+  lives one level up (dashboard/) as a proper React + Vite + Tailwind
+  multi-tab app — see dashboard/README.md.
+
+  Keep this file around anyway: it's a genuinely useful fallback for a
+  live demo — no `npm install`, no build step, no Node version surprises
+  five minutes before your review. Open it directly in a browser (or
+  serve it with any static file server) and it talks to the same FastAPI
+  backend via fetch(). If Node/npm isn't available on the demo machine,
+  this is your backup.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>PhishSentinel AI — Analyst Dashboard</title>
+<style>
+  :root {
+    --navy: #0A1526; --navy2: #0F1D33; --navy3: #1B2C47; --teal: #0EA5A8; --teal-light: #5EEAD4; --mint: #10B981;
+    --red: #DC2626; --amber: #D97706; --gray: #64748B; --line: #E6EAF0; --ink: #0F172A; --light: #F6F8FB;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--light); color: var(--ink);
+  }
+  header {
+    background: var(--navy); color: #fff; padding: 18px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  header h1 { font-size: 18px; margin: 0; }
+  header .sub { color: #9FB3CC; font-size: 12px; margin-top: 2px; }
+  .status-pill {
+    font-size: 11px; padding: 4px 10px; border-radius: 999px; background: var(--navy2);
+    border: 1px solid var(--navy3);
+  }
+  .status-pill.connected { color: var(--mint); border-color: var(--mint); }
+  .status-pill.disconnected { color: var(--red); border-color: var(--red); }
+
+  main { padding: 24px 28px; max-width: 1200px; margin: 0 auto; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .stat-card .label { font-size: 11px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .value { font-size: 26px; font-weight: 700; margin-top: 4px; }
+
+  .panel { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 20px; }
+  .panel-header { padding: 14px 18px; border-bottom: 1px solid #EEF2F6; font-weight: 600; font-size: 14px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 18px; border-bottom: 1px solid #F0F3F7; }
+  th { color: var(--gray); font-weight: 600; font-size: 11px; text-transform: uppercase; }
+  .badge { padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; color: #fff; }
+  .badge.safe { background: #0E8F6C; }
+  .badge.suspicious { background: var(--amber); }
+  .badge.phishing { background: var(--red); }
+
+  .tester { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 16px 18px; }
+  .tester input {
+    padding: 10px 12px; border-radius: 6px; border: 1px solid #D7DEE6; font-size: 13px;
+  }
+  .tester button {
+    background: var(--navy); color: #fff; border: none; border-radius: 6px; padding: 10px 18px;
+    font-size: 13px; cursor: pointer;
+  }
+  .tester button:hover { background: #132A4E; }
+  .result-box { margin: 0 18px 16px; padding: 12px 14px; border-radius: 8px; background: var(--light); font-size: 13px; display: none; }
+
+  .empty { padding: 24px; text-align: center; color: var(--gray); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>PhishSentinel AI</h1>
+    <div class="sub">Analyst Dashboard</div>
+  </div>
+  <div id="apiStatus" class="status-pill">checking API…</div>
+</header>
+
+<main>
+  <div class="stat-row">
+    <div class="stat-card"><div class="label">Total Analyzed</div><div class="value" id="statTotal">–</div></div>
+    <div class="stat-card"><div class="label">Flagged Phishing</div><div class="value" id="statPhishing">–</div></div>
+    <div class="stat-card"><div class="label">Suspicious</div><div class="value" id="statSuspicious">–</div></div>
+    <div class="stat-card"><div class="label">Safe</div><div class="value" id="statSafe">–</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">Quick URL Check</div>
+    <div class="tester">
+      <input id="urlInput" type="text" placeholder="Paste a URL to analyze, e.g. http://paypa1-secure-login.com" />
+      <button id="checkBtn">Analyze</button>
+    </div>
+    <div class="result-box" id="resultBox"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">Recent Verdicts</div>
+    <div id="tableWrap"><div class="empty">Loading…</div></div>
+  </div>
+</main>
+
+<script>
+const API_BASE = "http://localhost:8000";
+
+async function checkApiStatus() {
+  const pill = document.getElementById("apiStatus");
+  try {
+    const res = await fetch(`${API_BASE}/health`);
+    const data = await res.json();
+    pill.textContent = "API connected";
+    pill.className = "status-pill connected";
+  } catch {
+    pill.textContent = "API unreachable";
+    pill.className = "status-pill disconnected";
+  }
+}
+
+async function runCheck() {
+  const url = document.getElementById("urlInput").value.trim();
+  if (!url) return;
+  const box = document.getElementById("resultBox");
+  box.style.display = "block";
+  box.textContent = "Analyzing…";
+  try {
+    const res = await fetch(`${API_BASE}/analyze/url`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url }),
+    });
+    const data = await res.json();
+    box.innerHTML = `
+      <strong>Verdict: <span class="badge ${data.verdict}">${data.verdict}</span></strong>
+      &nbsp; Confidence: ${Math.round(data.confidence * 100)}%
+      <div style="margin-top:8px; color:#5B6B7F;">${data.explanation}</div>
+    `;
+    loadStats();
+    loadRecentVerdicts();
+  } catch (err) {
+    box.textContent = "Error: could not reach the PhishSentinel API. Is the backend running on " + API_BASE + "?";
+  }
+}
+
+document.getElementById("checkBtn").addEventListener("click", runCheck);
+document.getElementById("urlInput").addEventListener("keydown", (e) => { if (e.key === "Enter") runCheck(); });
+
+async function loadStats() {
+  try {
+    const res = await fetch(`${API_BASE}/analyze/stats`);
+    const s = await res.json();
+    document.getElementById("statTotal").textContent = s.total;
+    document.getElementById("statPhishing").textContent = s.phishing;
+    document.getElementById("statSuspicious").textContent = s.suspicious;
+    document.getElementById("statSafe").textContent = s.safe;
+  } catch {
+    // API unreachable — checkApiStatus() already surfaces this in the header pill
+  }
+}
+
+async function loadRecentVerdicts() {
+  const wrap = document.getElementById("tableWrap");
+  try {
+    const res = await fetch(`${API_BASE}/analyze/verdicts?limit=25`);
+    const rows = await res.json();
+    if (!rows.length) {
+      wrap.innerHTML = '<div class="empty">No verdicts recorded yet — run a check above, or via the extension.</div>';
+      return;
+    }
+    const body = rows.map(r => `
+      <tr>
+        <td><span class="badge ${r.verdict}">${r.verdict}</span></td>
+        <td>${Math.round(r.confidence * 100)}%</td>
+        <td>${r.input_type}</td>
+        <td style="max-width:420px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(r.raw_input || "")}</td>
+        <td>${new Date(r.created_at).toLocaleString()}</td>
+      </tr>
+    `).join("");
+    wrap.innerHTML = `
+      <table>
+        <thead><tr><th>Verdict</th><th>Confidence</th><th>Type</th><th>Input</th><th>Time</th></tr></thead>
+        <tbody>${body}</tbody>
+      </table>
+    `;
+  } catch {
+    wrap.innerHTML = '<div class="empty">Could not reach the PhishSentinel API.</div>';
+  }
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+checkApiStatus();
+loadStats();
+loadRecentVerdicts();
+setInterval(() => { checkApiStatus(); loadStats(); loadRecentVerdicts(); }, 15000);
+</script>
+
+</body>
+</html>
